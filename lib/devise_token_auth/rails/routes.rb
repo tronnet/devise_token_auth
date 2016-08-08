@@ -22,7 +22,10 @@ module ActionDispatch::Routing
       # remove any unwanted devise modules
       opts[:skip].each{|item| controllers.delete(item)}
 
-      devise_for resource.pluralize.underscore.gsub('/', '_').to_sym,
+      base_name = resource.split('::').last
+
+      #devise_for resource.pluralize.underscore.gsub('/', '_').to_sym,
+      devise_for base_name.pluralize.underscore.to_sym,
         :class_name  => resource,
         :module      => :devise,
         :path        => "#{opts[:at]}",
@@ -49,7 +52,8 @@ module ActionDispatch::Routing
         mapping_name = resource.underscore.gsub('/', '_')
         mapping_name = "#{namespace_name}_#{mapping_name}" if namespace_name
 
-        devise_scope mapping_name.to_sym do
+        #devise_scope mapping_name.to_sym do
+        devise_scope base_name.underscore.to_sym do
           # path to verify token validity
           get "#{full_path}/validate_token", controller: "#{token_validations_ctrl}", action: "validate_token"
 

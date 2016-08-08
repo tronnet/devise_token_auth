@@ -24,6 +24,9 @@ DeviseTokenAuth.setup do |config|
   # redirect successful authentications to '/omniauth/github/callback'
   # config.omniauth_prefix = "/omniauth"
 
+  # Whether app needs to be threadsafe/use locks.
+  # config.threadsafe = true
+
   # By default sending current password is not needed for the password update.
   # Uncomment to enforce current_password param to be checked before all
   # attribute updates. Set it to :password if you want it to be checked only if

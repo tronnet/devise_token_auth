@@ -1,4 +1,5 @@
 require 'bcrypt'
+require 'mongoid-locker'
 
 module DeviseTokenAuth::Concerns::User
   extend ActiveSupport::Concern
@@ -15,25 +16,27 @@ module DeviseTokenAuth::Concerns::User
   end
 
   included do
+    include Mongoid::Locker
+
     # Hack to check if devise is already enabled
     unless self.method_defined?(:devise_modules)
       devise :database_authenticatable, :registerable,
-          :recoverable, :trackable, :validatable, :confirmable
+      :recoverable, :trackable, :validatable, :confirmable
     else
       self.devise_modules.delete(:omniauthable)
     end
 
-    unless tokens_has_json_column_type?
-      serialize :tokens, JSON
-    end
+    #unless tokens_has_json_column_type?
+      #serialize :tokens, JSON
+    #end
 
     if DeviseTokenAuth.default_callbacks
       include DeviseTokenAuth::Concerns::UserOmniauthCallbacks
     end
 
     # can't set default on text fields in mysql, simulate here instead.
-    after_save :set_empty_token_hash
-    after_initialize :set_empty_token_hash
+    # after_save :set_empty_token_hash
+    # after_initialize :set_empty_token_hash
 
     # get rid of dead tokens
     before_save :destroy_expired_tokens
@@ -134,7 +137,7 @@ module DeviseTokenAuth::Concerns::User
 
       # ensure that the token is valid
       DeviseTokenAuth::Concerns::User.tokens_match?(token_hash, token)
-    )
+      )
   end
 
 
@@ -150,11 +153,12 @@ module DeviseTokenAuth::Concerns::User
       updated_at and last_token and
 
       # ensure that previous token falls within the batch buffer throttle time of the last request
-      Time.parse(updated_at) > Time.now - DeviseTokenAuth.batch_request_buffer_throttle and
+      #Time.parse(updated_at) > Time.now - DeviseTokenAuth.batch_request_buffer_throttle and
+      updated_at > Time.now - DeviseTokenAuth.batch_request_buffer_throttle and
 
       # ensure that the token is valid
       ::BCrypt::Password.new(last_token) == token
-    )
+      )
   end
 
 
@@ -227,29 +231,29 @@ module DeviseTokenAuth::Concerns::User
   def token_validation_response
     self.as_json(except: [
       :tokens, :created_at, :updated_at
-    ])
+      ])
   end
 
 
   protected
 
-  def set_empty_token_hash
-    self.tokens ||= {} if has_attribute?(:tokens)
-  end
+  # def set_empty_token_hash
+  #   self.tokens ||= {} if has_attribute?(:tokens)
+  # end
 
   def destroy_expired_tokens
     if self.tokens
-      self.tokens.delete_if do |cid, v|
+      self.tokens.delete_if {|cid,v|
         expiry = v[:expiry] || v["expiry"]
         DateTime.strptime(expiry.to_s, '%s') < Time.now
-      end
+       }
     end
   end
 
   def remove_tokens_after_password_reset
     there_is_more_than_one_token = self.tokens && self.tokens.keys.length > 1
     should_remove_old_tokens = DeviseTokenAuth.remove_tokens_after_password_reset &&
-                               encrypted_password_changed? && there_is_more_than_one_token
+    encrypted_password_changed? && there_is_more_than_one_token
 
     if should_remove_old_tokens
       latest_token = self.tokens.max_by { |cid, v| v[:expiry] || v["expiry"] }

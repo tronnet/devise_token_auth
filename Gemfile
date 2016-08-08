@@ -13,6 +13,8 @@ gemspec
 # To use debugger
 # gem 'debugger'
 
+gem 'mongoid', '~> 4.0.0'
+
 group :development, :test do
   gem 'thor'
   gem "figaro",                 :github => 'laserlemon/figaro'

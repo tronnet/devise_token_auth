@@ -14,6 +14,7 @@ module DeviseTokenAuth
                  :token_lifespan,
                  :batch_request_buffer_throttle,
                  :omniauth_prefix,
+                 :threadsafe,
                  :default_confirm_success_url,
                  :default_password_reset_url,
                  :redirect_whitelist,
@@ -28,6 +29,7 @@ module DeviseTokenAuth
   self.token_lifespan                       = 2.weeks
   self.batch_request_buffer_throttle        = 5.seconds
   self.omniauth_prefix                      = '/omniauth'
+  self.threadsafe                           = true
   self.default_confirm_success_url          = nil
   self.default_password_reset_url           = nil
   self.redirect_whitelist                   = nil

@@ -22,7 +22,7 @@ module DeviseTokenAuth
 
       # if whitelist is set, validate redirect_url against whitelist
       if DeviseTokenAuth.redirect_whitelist
-        unless DeviseTokenAuth.redirect_whitelist.include?(@redirect_url)
+        unless DeviseTokenAuth::Url.whitelisted?(@redirect_url)
           return render_create_error_not_allowed_redirect_url
         end
       end
@@ -69,7 +69,7 @@ module DeviseTokenAuth
         reset_password_token: resource_params[:reset_password_token]
       })
 
-      if @resource and @resource.id
+      if @resource && @resource.id
         client_id  = SecureRandom.urlsafe_base64(nil, false)
         token      = SecureRandom.urlsafe_base64(nil, false)
         token_hash = BCrypt::Password.create(token)
@@ -112,7 +112,7 @@ module DeviseTokenAuth
       end
 
       # ensure that password params were sent
-      unless password_resource_params[:password] and password_resource_params[:password_confirmation]
+      unless password_resource_params[:password] && password_resource_params[:password_confirmation]
         return render_update_error_missing_password
       end
 
@@ -161,7 +161,6 @@ module DeviseTokenAuth
     def render_create_success
       render json: {
         success: true,
-        data: resource_data,
         message: I18n.t("devise_token_auth.passwords.sended", email: @email)
       }
     end
@@ -216,7 +215,7 @@ module DeviseTokenAuth
     private
 
     def resource_params
-      params.permit(:email, :password, :password_confirmation, :current_password, :reset_password_token, :login)
+      params.permit(:email, :password, :password_confirmation, :current_password, :reset_password_token, :login, :redirect_url, :config)
     end
 
     def password_resource_params

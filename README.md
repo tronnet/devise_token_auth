@@ -12,7 +12,10 @@
 
 This gem provides the following features:
 
-* Seamless integration with both the the venerable [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) module for [angular.js](https://github.com/angular/angular.js) and the outstanding [jToker](https://github.com/lynndylanhurley/j-toker) plugin for [jQuery](https://jquery.com/).
+* Seamless integration with:
+  * [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) for [AngularJS](https://github.com/angular/angular.js)
+  * [Angular2-Token](https://github.com/neroniaky/angular2-token) for [Angular2](https://github.com/angular/angular)
+  * [jToker](https://github.com/lynndylanhurley/j-toker) for [jQuery](https://jquery.com/)
 * Oauth2 authentication using [OmniAuth](https://github.com/intridea/omniauth).
 * Email authentication using [Devise](https://github.com/plataformatec/devise), including:
   * User registration
@@ -24,7 +27,9 @@ This gem provides the following features:
 
 # Live Demos
 
-[Here is a demo](http://ng-token-auth-demo.herokuapp.com/) of this app running with the [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) module and [AngularJS](https://angularjs.org/).
+[Here is a demo](http://ng-token-auth-demo.herokuapp.com/) of this app running with the [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) module and [AngularJS](https://github.com/angular/angular.js).
+
+[Here is a demo](https://angular2-token.herokuapp.com) of this app running with the [Angular2-Token](https://github.com/neroniaky/angular2-token) service and [Angular2](https://github.com/angular/angular).
 
 [Here is a demo](https://j-toker-demo.herokuapp.com/) of this app using the [jToker](https://github.com/lynndylanhurley/j-toker) plugin and [React](http://facebook.github.io/react/).
 
@@ -163,7 +168,7 @@ The following settings are available for configuration in `config/initializers/d
 | **`omniauth_prefix`** | `"/omniauth"` | This route will be the prefix for all oauth2 redirect callbacks. For example, using the default '/omniauth' setting, the github oauth2 provider will redirect successful authentications to '/omniauth/github/callback'. [Read more](#omniauth-provider-settings). |
 | **`default_confirm_success_url`** | `nil` | By default this value is expected to be sent by the client so that the API knows where to redirect users after successful email confirmation. If this param is set, the API will redirect to this value when no value is provided by the client. |
 | **`default_password_reset_url`** | `nil` | By default this value is expected to be sent by the client so that the API knows where to redirect users after successful password resets. If this param is set, the API will redirect to this value when no value is provided by the client. |
-| **`redirect_whitelist`** | `nil` | As an added security measure, you can limit the URLs to which the API will redirect after email token validation (password reset, email confirmation, etc.). This value should be an array containing exact matches to the client URLs to be visited after validation. |
+| **`redirect_whitelist`** | `nil` | As an added security measure, you can limit the URLs to which the API will redirect after email token validation (password reset, email confirmation, etc.). This value should be an array containing matches to the client URLs to be visited after validation. Wildcards are supported. |
 | **`enable_standard_devise_support`** | `false` | By default, only Bearer Token authentication is implemented out of the box. If, however, you wish to integrate with legacy Devise authentication, you can do so by enabling this flag. NOTE: This feature is highly experimental! |
 | **`remove_tokens_after_password_reset`** | `false` | By default, old tokens are not invalidated when password is changed. Enable this option if you want to make passwords updates to logout other devices. |
 | **`default_callbacks`** | `true` | By default User model will include the `DeviseTokenAuth::Concerns::UserOmniauthCallbacks` concern, which has `email`, `uid` validations & `uid` synchronization callbacks. |
@@ -499,6 +504,7 @@ Models that include the `DeviseTokenAuth::Concerns::User` concern will have acce
 ### View Live Multi-User Demos
 
 * [AngularJS](http://ng-token-auth-demo.herokuapp.com/multi-user)
+* [Angular2](https://angular2-token.herokuapp.com)
 * [React + jToker](http://j-toker-demo.herokuapp.com/#/alt-user)
 
 This gem supports the use of multiple user models. One possible use case is to authenticate visitors using a model called `User`, and to authenticate administrators with a model called `Admin`. Take the following steps to add another authentication model to your app:
@@ -764,20 +770,20 @@ These files may be edited to suit your taste. You can customize the e-mail subje
 
 When posting issues, please include the following information to speed up the troubleshooting process:
 
-* **Version**: which version of this gem (and [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth) / [jToker](https://github.com/lynndylanhurley/j-toker) if applicable) are you using?
+* **Version**: which version of this gem (and [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth), [jToker](https://github.com/lynndylanhurley/j-toker) or [Angular2-Token](https://github.com/neroniaky/angular2-token) if applicable) are you using?
 * **Request and response headers**: these can be found in the "Network" tab of your browser's web inspector.
 * **Rails Stacktrace**: this can be found in the `log/development.log` of your API.
 * **Environmental Info**: How is your application different from the [reference implementation](https://github.com/lynndylanhurley/devise_token_auth_demo)? This may include (but is not limited to) the following details:
   * **Routes**: are you using some crazy namespace, scope, or constraint?
   * **Gems**: are you using MongoDB, Grape, RailsApi, ActiveAdmin, etc.?
   * **Custom Overrides**: what have you done in terms of [custom controller overrides](#custom-controller-overrides)?
-  * **Custom Frontend**: are you using [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth), [jToker](https://github.com/lynndylanhurley/j-toker), or something else?
+  * **Custom Frontend**: are you using [ng-token-auth](https://github.com/lynndylanhurley/ng-token-auth), [jToker](https://github.com/lynndylanhurley/j-toker), [Angular2-Token](https://github.com/neroniaky/angular2-token), or something else?
 
 # FAQ
 
 ### Can I use this gem alongside standard Devise?
 
-Yes! But you will need to enable the support use separate routes for standard Devise. So do something like this:
+Yes! But you will need to enable the support of separate routes for standard Devise. So do something like this:
 
 #### config/initializers/devise_token_auth.rb
 ~~~ruby
@@ -847,7 +853,8 @@ These measures are taken by default when using this gem.
 
 By default, the API should update the auth token for each request ([read more](#about-token-management)). But sometimes it's necessary to make several concurrent requests to the API, for example:
 
-#####Batch request example
+##### Batch request example
+
 ~~~javascript
 $scope.getResourceData = function() {
 
@@ -873,7 +880,7 @@ The following diagram details the relationship between the client, server, and a
 
 ![batch request detail](https://github.com/lynndylanhurley/ng-token-auth/raw/master/test/app/images/flow/batch-request-detail.jpg)
 
-Note that when the server identifies that a request is part of a batch request, the user's auth token is not updated. The auth token will be updated for the first request in the batch, and then that same token will be returned in the responses for each subsequent request in the batch (as shown in the diagram).
+Note that when the server identifies that a request is part of a batch request, the user's auth token is not updated. The auth token will be updated and returned with the first request in the batch, and the subsequent requests in the batch will not return a token. This is necessary because the order of the responses cannot be guaranteed to the client, and we need to be sure that the client does not receive an outdated token *after* the the last valid token is returned.
 
 This gem automatically manages batch requests. You can change the time buffer for what is considered a batch request using the `batch_request_buffer_throttle` parameter in `config/initializers/devise_token_auth.rb`.
 
@@ -930,6 +937,7 @@ To run the test suite do the following:
 The last command will open the [guard](https://github.com/guard/guard) test-runner. Guard will re-run each test suite when changes are made to its corresponding files.
 
 To run just one test:
+
 1. Clone this repo
 2. Run `bundle install`
 3. Run `rake db:migrate`
